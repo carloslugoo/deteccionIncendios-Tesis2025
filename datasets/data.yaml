@@ -1,0 +1,6 @@
+path: B:\Coding\deteccionIncendios-Tesis2025\datasets\incendiosV1
+train: B:\Coding\deteccionIncendios-Tesis2025\datasets\incendiosV1\images\train
+val: B:\Coding\deteccionIncendios-Tesis2025\datasets\incendiosV1\images\val
+test: B:\Coding\deteccionIncendios-Tesis2025\datasets\incendiosV1\images\test
+nc: 2
+names: ['fuego', 'humo']
