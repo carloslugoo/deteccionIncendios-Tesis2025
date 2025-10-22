@@ -2,7 +2,12 @@ from ultralytics import YOLO
 from comet_ml import Experiment
 import os
 from pathlib import Path
+import numpy as np
+import cv2
+import shutil
+
 def main():
+    
 
     # Cargar variables desde .env en la raíz del proyecto (opcional). Si python-dotenv
     # no está instalado, el script seguirá usando las variables de entorno ya presentes.
@@ -32,7 +37,7 @@ def main():
             project_name="deteccion_incendios",
             workspace="carloslugoo"
         )
-        experiment.set_name("Iteracion_1 - YOLOv11 Fuego/Humo")
+        experiment.set_name("Iteracion_2 - YOLOv8n Fuego/Humo")
     except Exception as e:
         # Si falla, no detener el script: crear un "dummy" que tenga los métodos usados más adelante
         print(f"WARNING: Comet no inicializado: {e}")
@@ -84,19 +89,42 @@ def main():
     else:
         print("⚠️ best.pt no encontrado en:", best_weight)
 
-    img_path = Path(r"B:\Tesis\2025\Recursos\Datasets Publicos\Clasificacion de imagenes\Test\train_651.jpg")
+    img_path = Path(r"B:\Tesis\2025\Recursos\Datasets Publicos\Clasificacion de imagenes\Test\train_2136.jpg")
     if not img_path.exists():
         raise FileNotFoundError(f"No existe: {img_path}")
-    # Inferencia en una imagen (URL o ruta local)
+
     print("📷 Ejecutando inferencia de ejemplo...")
-    inf_results = model(str(img_path), imgsz=train_params["imgsz"])
-    # inf_results es iterable; tomar el primer resultado
-    r = inf_results[0]
-    print("Detecciones:", getattr(r, "boxes", None))
-    # Guardar imagen anotada en disco (si quieres)
-    out_dir = os.path.join("runs", "detect", "demo")
-    os.makedirs(out_dir, exist_ok=True)
-    r.save(out_dir)  # guarda imagen anotada
+    try:
+        # usar predict en vez de llamada directa; captura excepciones claras
+        inf_results = model.predict(source=str(img_path), imgsz=train_params["imgsz"])
+    except Exception as e:
+        print("Error durante inferencia:", e)
+        raise
+
+    if not inf_results:
+        print("Inferencia completada pero no se recibieron resultados.")
+    else:
+        r = inf_results[0]
+        print("Detecciones (boxes):", getattr(r, "boxes", None))
+
+        out_dir = os.path.join("runs", "detect", "demo")
+        os.makedirs(out_dir, exist_ok=True)
+
+        # Intentar guardar la imagen anotada de forma segura
+        try:
+            annotated = r.plot()  # devuelve numpy array o PIL Image según versión
+            out_path = os.path.join(out_dir, img_path.name)
+            if isinstance(annotated, np.ndarray):
+                # ultralytics suele devolver RGB; cv2.imwrite espera BGR
+                cv2.imwrite(out_path, cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
+            else:
+                annotated.save(out_path)
+            print("Imagen anotada guardada en:", out_path)
+        except Exception as e:
+            print("No se pudo guardar la imagen anotada con r.plot/save:", e)
+            # fallback: guardar la original
+            shutil.copy(str(img_path), out_dir)
+            print("Copia de la original guardada en:", out_dir)
 
     # =============================
     # REGISTRO EN COMET
