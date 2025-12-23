@@ -1,5 +1,4 @@
 from ultralytics import YOLO
-from comet_ml import Experiment
 import os
 from pathlib import Path
 import numpy as np
@@ -23,54 +22,68 @@ def main():
         print("python-dotenv no instalado; para cargar .env automáticamente: pip install python-dotenv")
 
     # =============================
-    # CONFIGURACIÓN DE COMET
-    # =============================
-    # Obtener API key desde variable de entorno; si quieres forzarla aquí, ponla en COMET_API_KEY
-    _comet_api_key = os.environ.get("COMET_API_KEY")
-
-    try:
-        if not _comet_api_key:
-            raise ValueError("COMET_API_KEY no está definida en el entorno")
-        from comet_ml import Experiment
-        experiment = Experiment(
-            api_key=_comet_api_key,
-            project_name="deteccion_incendios",
-            workspace="carloslugoo"
-        )
-        experiment.set_name("Iteracion_2 - YOLOv8n Fuego/Humo")
-    except Exception as e:
-        # Si falla, no detener el script: crear un "dummy" que tenga los métodos usados más adelante
-        print(f"WARNING: Comet no inicializado: {e}")
-        class _DummyExperiment:
-            def set_name(self, *a, **k): pass
-            def log_metrics(self, *a, **k): pass
-            def log_asset(self, *a, **k): pass
-        experiment = _DummyExperiment()
-
-    # =============================
     # CONFIGURACIÓN DEL MODELO
     # =============================
     # Cargamos un modelo base de YOLO (nano o small para comenzar)
-    model = YOLO("yolo11n.pt")  # ✅ Modelo correcto
+    model = YOLO("yolo11s.pt")  # ✅ Modelo correcto
 
     # =============================
     # PARÁMETROS DE ENTRENAMIENTO
     # =============================
     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "data.yaml"))
-
+    
     train_params = {
-        "data": data_path,        # Ruta al archivo data.yaml
-        "epochs": 50,             # Número de épocas
-        "imgsz": 640,             # Tamaño de imagen
-        "batch": 16,              # Tamaño del batch
-        "lr0": 0.001,             # Tasa de aprendizaje inicial
-        "patience": 10,           # Early stopping
-        "project": "runs/train",  # Carpeta donde se guardan los resultados
-        "name": "iteracion_1",    # Nombre de la ejecución
-        "device": 0,              # GPU si existe, 0 = primera GPU / 'cpu' si no hay
-        "exist_ok": True,         # Permite sobrescribir si ya existe
-        "verbose": True
+        "data": data_path,
+        "epochs": 60,
+        "imgsz": 640,
+        "batch": 16,
+        "lr0": 0.001,
+        "patience": 12,
+        "project": "runs/train",
+        "name": "iteracion_4_yolov11s_w2.0cls0.8_augLight",
+        "device": 0,
+        "exist_ok": True,
+        "verbose": True,
+        "save": True,
+
+        # ------------------------
+        # PÉRDIDA / CLASES
+        # ------------------------
+        "cls": 0.8,                 # Mantener prioridad en clasificación
+
+        # ------------------------
+        # DATA AUGMENTATION (SUAVE)
+        # ------------------------
+        "augment": True,
+
+        # Color / iluminación (MUY IMPORTANTE PARA HUMO)
+        "hsv_h": 0.015,              # Cambio leve de tono
+        "hsv_s": 0.40,               # Saturación moderada
+        "hsv_v": 0.30,               # Brillo moderado
+
+        # Transformaciones geométricas suaves
+        "degrees": 0.0,              # NO rotar (humo se distorsiona)
+        "translate": 0.05,           # Desplazamiento leve
+        "scale": 0.30,               # Escala moderada
+        "shear": 0.0,                # Evitar deformaciones
+
+        # Flip
+        "fliplr": 0.5,               # Flip horizontal OK
+        "flipud": 0.0,               # Flip vertical NO recomendado
+
+        # ------------------------
+        # AUGMENTATIONS A LIMITAR
+        # ------------------------
+        "mosaic": 0.2,               # MUY bajo (default suele ser 1.0)
+        "mixup": 0.0,                # Desactivado (humo se vuelve irreal)
+        "copy_paste": 0.0,           # Desactivado (riesgo de humo falso)
+
+        # ------------------------
+        # REGULARIZACIÓN
+        # ------------------------
+        "label_smoothing": 0.05      # Ayuda a estabilidad sin perder señal
     }
+
 
     # =============================
     # ENTRENAMIENTO
@@ -127,25 +140,40 @@ def main():
             print("Copia de la original guardada en:", out_dir)
 
     # =============================
-    # REGISTRO EN COMET
+    # REGISTRO DE MÉTRICAS (sin Comet)
     # =============================
-    # Subir métricas clave al experimento
-    experiment.log_metrics({
-        "train/box_loss": results.box_loss,
-        "train/cls_loss": results.cls_loss,
-        "val/mAP50": results.maps[0] if results.maps else None,
-        "val/mAP50-95": results.maps[1] if len(results.maps) > 1 else None
-    })
-
-    # Guardar el mejor modelo
-    experiment.log_asset("runs/train/iteracion_1/weights/best.pt")
-
+    try:
+        metrics = {}
+        csv_path = os.path.join("runs", "train", train_params["name"], "results.csv")
+        if os.path.exists(csv_path):
+            try:
+                import pandas as pd
+                df = pd.read_csv(csv_path)
+                last = df.tail(1).iloc[0].to_dict()
+                metrics.update({
+                    "train/box_loss": last.get("box_loss") or last.get("box"),
+                    "train/cls_loss": last.get("cls_loss") or last.get("cls"),
+                    "val/mAP50": last.get("mAP_0.5") or last.get("mAP50"),
+                    "val/mAP50-95": last.get("mAP_0.5:0.95") or last.get("mAP50-95"),
+                })
+            except Exception:
+                pass
+        if 'val_results' in locals() and val_results is not None:
+            try:
+                rd = val_results.results_dict() if hasattr(val_results, "results_dict") else {}
+                metrics.setdefault("val/mAP50", rd.get("mAP_0.5") or rd.get("map50"))
+            except Exception:
+                pass
+        print("Metrics:", metrics)
+        print("Best weight path:", best_weight)
+    except Exception:
+        pass
 
     print("📦 Exportando modelo a ONNX...")
     export_path = model.export(format="onnx")
     print("Export result:", export_path)
 
-    print("✅ Entrenamiento completado y registrado en Comet.")
+    print("✅ Entrenamiento completado.")
 
 if __name__ == "__main__":
     from multiprocessing import freeze_support

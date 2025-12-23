@@ -3,7 +3,7 @@ import random
 import shutil
 
 # Construye rutas absolutas respecto al archivo actual
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "datasets", "incendiosV1"))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "datasets", "interioresV3_ConHumos"))
 img_path = os.path.join(BASE_DIR, "images")
 label_path = os.path.join(BASE_DIR, "labels")
 
