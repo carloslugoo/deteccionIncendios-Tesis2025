@@ -1,7 +1,7 @@
-path: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV3_ConHumos
-train: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV3_ConHumos\images\train
-val: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV3_ConHumos\images\val
-test: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV3_ConHumos\images\test
+path: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg
+train: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\train
+val: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\val
+test: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\test
 nc: 2
 names: ['fuego', 'humo']
-weights: [1.0, 1.5]
+weights: [1.0, 3.0]

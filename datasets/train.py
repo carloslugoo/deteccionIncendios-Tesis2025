@@ -25,64 +25,31 @@ def main():
     # CONFIGURACIÓN DEL MODELO
     # =============================
     # Cargamos un modelo base de YOLO (nano o small para comenzar)
-    model = YOLO("yolo11s.pt")  # ✅ Modelo correcto
+    model = YOLO("yolo11s.pt") 
 
     # =============================
     # PARÁMETROS DE ENTRENAMIENTO
     # =============================
     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "data.yaml"))
+    #iteracion_5
     
     train_params = {
-        "data": data_path,
-        "epochs": 60,
-        "imgsz": 640,
-        "batch": 16,
-        "lr0": 0.001,
-        "patience": 12,
-        "project": "runs/train",
-        "name": "iteracion_4_yolov11s_w2.0cls0.8_augLight",
-        "device": 0,
-        "exist_ok": True,
-        "verbose": True,
-        "save": True,
-
-        # ------------------------
-        # PÉRDIDA / CLASES
-        # ------------------------
-        "cls": 0.8,                 # Mantener prioridad en clasificación
-
-        # ------------------------
-        # DATA AUGMENTATION (SUAVE)
-        # ------------------------
-        "augment": True,
-
-        # Color / iluminación (MUY IMPORTANTE PARA HUMO)
-        "hsv_h": 0.015,              # Cambio leve de tono
-        "hsv_s": 0.40,               # Saturación moderada
-        "hsv_v": 0.30,               # Brillo moderado
-
-        # Transformaciones geométricas suaves
-        "degrees": 0.0,              # NO rotar (humo se distorsiona)
-        "translate": 0.05,           # Desplazamiento leve
-        "scale": 0.30,               # Escala moderada
-        "shear": 0.0,                # Evitar deformaciones
-
-        # Flip
-        "fliplr": 0.5,               # Flip horizontal OK
-        "flipud": 0.0,               # Flip vertical NO recomendado
-
-        # ------------------------
-        # AUGMENTATIONS A LIMITAR
-        # ------------------------
-        "mosaic": 0.2,               # MUY bajo (default suele ser 1.0)
-        "mixup": 0.0,                # Desactivado (humo se vuelve irreal)
-        "copy_paste": 0.0,           # Desactivado (riesgo de humo falso)
-
-        # ------------------------
-        # REGULARIZACIÓN
-        # ------------------------
-        "label_smoothing": 0.05      # Ayuda a estabilidad sin perder señal
+    "data": data_path,
+    "epochs": 80,
+    "imgsz": 640,
+    "batch": 16,
+    "lr0": 0.001,
+    "patience": 15,
+    "project": "runs/train",
+    "name": "iteracion5_smokeFirst_yolov11s_wSmoke3.0_cls0.6_80Epochs",
+    "device": 0,
+    "exist_ok": True,
+    "verbose": True,
+    "save": True,
+    "cls": 0.6,            
+    "augment": False,
     }
+
 
 
     # =============================

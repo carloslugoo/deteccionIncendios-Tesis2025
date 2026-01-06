@@ -92,7 +92,7 @@ def procesar_carpeta_completa(model_path, carpeta_pruebas, conf=0.50):
     model = YOLO(model_path)
     
     # Crear directorio de resultados
-    directorio_resultados = "resultados_pruebas4YOLOV11weights2.0smoke0.8clsAumentLight"
+    directorio_resultados = "resultados_pruebas5_yolov11s_wSmoke3.0_cls0.6_noMosaic"
     crear_directorio_si_no_existe(directorio_resultados)
     
     # Extensiones soportadas
@@ -133,7 +133,7 @@ def procesar_archivo_individual(model_path, archivo_path, conf=0.50):
     model = YOLO(model_path)
     
     # Crear directorio de resultados
-    directorio_resultados = "resultados_pruebas4YOLOV11weights2.0smoke0.8clsAumentLight"
+    directorio_resultados = "resultados_pruebas5_yolov11s_wSmoke3.0_cls0.6_noMosaic"
     crear_directorio_si_no_existe(directorio_resultados)
     
     # Determinar si es imagen o video
@@ -152,7 +152,7 @@ def procesar_archivo_individual(model_path, archivo_path, conf=0.50):
 
 # Ejemplos de uso:
 if __name__ == "__main__":
-    model_path = 'runs/train/iteracion_4_yolov11s_w2.0cls0.8_augLight/weights/best.pt'
+    model_path = 'runs/train/iteracion5_smokeFirst_yolov11s_wSmoke3.0_cls0.6_noMosaic/weights/best.pt'
     
     # Opción 1: Procesar una carpeta completa
     carpeta_pruebas = 'test'  # Cambia por tu carpeta de pruebas
