@@ -3,7 +3,7 @@ import random
 import shutil
 
 # Construye rutas absolutas respecto al archivo actual
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "datasets", "interioresV4_3Kimg"))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "datasets", "interioresV5"))
 img_path = os.path.join(BASE_DIR, "images")
 label_path = os.path.join(BASE_DIR, "labels")
 
@@ -21,7 +21,7 @@ for split in ["train", "val", "test"]:
 # Lista solo archivos de imagen (evita directorios)
 images = [
     f for f in os.listdir(img_path)
-    if os.path.isfile(os.path.join(img_path, f)) and f.lower().endswith((".jpg", ".jpeg", ".png"))
+    if os.path.isfile(os.path.join(img_path, f)) and f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".webp"))
 ]
 
 if not images:
@@ -29,13 +29,17 @@ if not images:
 
 random.shuffle(images)
 
-train_split = int(0.8 * len(images))
-val_split = int(0.15 * len(images))
+n = len(images)
+
+train_count = int(0.8 * n)
+val_count = int(0.1 * n)
+# asegurar que la suma cubra todos los archivos (ajusta por redondeo)
+test_count = n - train_count - val_count
 
 splits = {
-    "train": images[:train_split],
-    "val": images[train_split:train_split + val_split],
-    "test": images[train_split + val_split:]
+    "train": images[:train_count],
+    "val": images[train_count:train_count + val_count],
+    "test": images[train_count + val_count:],
 }
 
 moved_counts = {"train": 0, "val": 0, "test": 0}

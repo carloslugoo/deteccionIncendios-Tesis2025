@@ -1,7 +1,10 @@
-path: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg
-train: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\train
-val: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\val
-test: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV4_3Kimg\images\test
+path: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV5
+train: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV5\images\train
+val: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV5\images\val
+test: B:\Coding\deteccionIncendios-Tesis2025\datasets\interioresV5\images\test
 nc: 2
 names: ['fuego', 'humo']
-weights: [1.0, 3.0]
+weights: [1.0, 1.5]
+# class 0 (fuego) weight = 1.0
+# class 1 (humo) weight = 3.0 / 2.0 o 1.5 dependiendo de la iteracion
+

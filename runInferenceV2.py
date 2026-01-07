@@ -281,18 +281,18 @@ def procesar_archivo_individual(model_path: str, archivo_path: str,
 # =========================
 if __name__ == "__main__":
     # Ruta al modelo (cambiá por tu best.pt)
-    model_path = "runs/train/iteracion5_smokeFirst_yolov11s_wSmoke3.0_cls0.6_80Epochs/weights/best.pt"
+    model_path = "runs/train/iteracion6_yolov11s_wSmoke3.0_cls0.6_80Epochs_patience15/weights/best.pt"
 
     # Carpeta de prueba
-    carpeta_pruebas = "test"
+    carpeta_pruebas = "Pruebas"
 
     # Recomendación para hiper-sensibilidad al humo:
     # - conf_global muy bajo para NO descartar humo temprano
     # - conf_smoke bajo (humo tenue)
     # - conf_fire más alto (evita falsos positivos en fuego)
     conf_global = 0.01
-    conf_smoke = 0.05
-    conf_fire = 0.25
+    conf_smoke = 0.12
+    conf_fire = 0.45
 
     procesar_carpeta_completa(
         model_path=model_path,
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         conf_smoke=conf_smoke,
         conf_global=conf_global,
         imgsz=640,
-        directorio_resultados="resultados_smokeFirst_yolov11s_wSmoke3.0_cls0.6_80Epochs"
+        directorio_resultados="resultados_finales_inferencia_2Smoke1.5_Balanced1_Smoke12_Fire45"
     )
 
     # Para un archivo individual:
