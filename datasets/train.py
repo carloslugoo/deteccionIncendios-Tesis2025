@@ -113,7 +113,7 @@ def main():
         "lr0": 0.001,
         "patience": 12, #si es 80 = 15, si es 60 = 12
         "project": "runs/train",
-        "name": "iteracion6_yolov11s_wSmoke1.5_cls0.8_60Epochs_patience12",
+        "name": "iteracion6_yolov11s_wSmoke2.0_cls0.8_60Epochs_patience12",
         "device": 0,
         "exist_ok": True,
         "verbose": True,

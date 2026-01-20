@@ -281,7 +281,7 @@ def procesar_archivo_individual(model_path: str, archivo_path: str,
 # =========================
 if __name__ == "__main__":
     # Ruta al modelo (cambiá por tu best.pt)
-    model_path = "runs/train/iteracion6_yolov11s_wSmoke3.0_cls0.6_80Epochs_patience15/weights/best.pt"
+    model_path = "runs/train/iteracion6_yolov11s_wSmoke2.0_cls0.8_60Epochs_patience12/weights/best.pt"
 
     # Carpeta de prueba
     carpeta_pruebas = "Pruebas"
