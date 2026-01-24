@@ -7,8 +7,8 @@ BOT_TOKEN = "8287303105:AAFWnNz--txS-wEHgKwfbcpzIBHK1GX9V8w"
 CHAT_ID = "8260346609"  # puede ser int o string
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
-ALERT_DIR = r"B:\Coding\deteccionIncendios-Tesis2025\alerts"
-os.makedirs(ALERT_DIR, exist_ok=True)
+ALERT_DIR = r"B:\Coding\deteccionIncendios-Tesis2025\alerts\alert_2026-01-20_21-02-50.jpg"
+#os.makedirs(ALERT_DIR, exist_ok=True)
 
 _last_telegram = 0.0
 TELEGRAM_COOLDOWN = 20  # segundos
@@ -64,5 +64,4 @@ msg = f"🚨 ALERTA INCENDIO\n🕒 {ts}\n📷 Imagen adjunta"
 
 send_telegram_text(msg)
 
-img_path = os.path.join(ALERT_DIR, f"2014825.png")
-send_telegram_photo(img_path, caption="Detección automática")
+send_telegram_photo(ALERT_DIR)

@@ -13,7 +13,7 @@ from datetime import datetime
 NOTEBOOK_IP = "192.168.0.138"
 BASE = f"http://{NOTEBOOK_IP}:5000"
 RTSP_URL = f"rtsp://{NOTEBOOK_IP}:8554/cam"
-MODEL_PATH = "runs/train/iteracion6_yolov11s_wSmoke3.0_cls0.6_80Epochs_patience15/weights/best.pt"
+MODEL_PATH = "runs/train/iteracion6_yolov11s_wSmoke2.0_cls0.6_80Epochs_patience15/weights/best.pt"
 ALARM_PATH = "sounds/alarm.mp3"
 COOLDOWN_SECONDS = 10
 _last_alarm = 0.0
@@ -50,21 +50,41 @@ def trigger_alarm(kind="default"):
         print(f"⚠️ No se pudo disparar alarma: {e}")
 
 def play_alarm():
-    global _last_alarm, _player
+    global _last_alarm, _player, _instance
     now = time.time()
     if now - _last_alarm < COOLDOWN_SECONDS:
         return
     _last_alarm = now
 
-    def _run():
-        global _player
-        try:
-            _player = vlc.MediaPlayer(ALARM_PATH)
-            _player.play()
-        except Exception as e:
-            print(f"⚠️ Error reproduciendo alarma: {e}")
+    if not os.path.exists(ALARM_PATH):
+        print("⚠️ Archivo de alarma no encontrado:", ALARM_PATH)
+        return
 
-    threading.Thread(target=_run, daemon=True).start()
+    def _run():
+        global _player, _instance
+        try:
+            _instance = vlc.Instance()
+            media = _instance.media_new(ALARM_PATH)
+            _player = _instance.media_player_new()
+            _player.set_media(media)
+            _player.audio_set_volume(100)
+
+            rc = _player.play()
+            #print("vlc play() returned:", rc)
+
+            time.sleep(0.2)
+            length_ms = _player.get_length()
+            if length_ms and length_ms > 0:
+                time.sleep(length_ms / 1000.0)
+            else:
+                # fallback: esperar 6s para que se oiga aunque no haya duración
+                time.sleep(6)
+        except Exception as e:
+            print("⚠️ Error reproduciendo alarma:", e)
+
+    # hilo NO daemon para que el proceso espere a que termine la reproducción
+    t = threading.Thread(target=_run, daemon=False)
+    t.start()
     
 
 def send_telegram_text(text: str):
@@ -195,7 +215,7 @@ def main():
                     cv2.imwrite(img_path, annotated)
 
                 # enviar foto
-                sent = send_telegram_photo(img_path, caption=msg)
+                sent = send_telegram_photo(img_path)
                 if not sent:
                     print("⚠️ No se pudo enviar la foto por Telegram.")
                 else:

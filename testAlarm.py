@@ -1,8 +1,8 @@
 import requests
 
 NOTEBOOK_IP = "192.168.0.138"  
-BASE = f"http://{NOTEBOOK_IP}:5000"
-
+#BASE = f"http://{NOTEBOOK_IP}:5000"
+BASE = f"http://localhost:5000"
 def trigger_alarm(kind="default"):
     endpoint = {
         "default": "/alarm",
