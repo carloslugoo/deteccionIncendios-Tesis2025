@@ -31,8 +31,6 @@ Detectar incendios en interiores en tiempo real mediante visión por computadora
 
 ## ⚙️ Tecnologías Utilizadas
 
-El proyecto fue desarrollado utilizando herramientas y librerías comunes en visión por computadora:
-
 - Python (OpenCv, PyTorch, Flask, Ultralytics)
 - YOLO
 - Label Studio
